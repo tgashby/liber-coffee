@@ -4,7 +4,9 @@ angular.module('liber-coffee', ['arsenal', 'hash64'])
 .controller('LoadoutCtrl', function($scope, $location, arsenal, hash64){
 
   $scope.loadout = {stratagems: []};
+  $scope.lockedStratagems = [{name: ''}];
   $scope.initDone = false;
+  $scope.arsenal = arsenal;
 
   $scope.diceoptions = [
     {
@@ -72,11 +74,15 @@ angular.module('liber-coffee', ['arsenal', 'hash64'])
     $scope.loadout.id = null;
     if ($scope.initDone) {$scope.calcHash();}
   };
+
   $scope.rollallStratagems = function() {
     for(var i=0; i<4; i++) {
       $scope.loadout.stratagems[i] = arsenal.getRandomStratagem(i, $scope.dicemode.weighting);
     }
     $scope.loadout.id = null;
+    
+    ensureLockedStrats();
+
     if ($scope.initDone) {$scope.calcHash();}
   };
 
@@ -89,8 +95,34 @@ angular.module('liber-coffee', ['arsenal', 'hash64'])
       $scope.loadout = arsenal.getRandomLoadout($scope.dicemode.pool)
       $scope.calcHash();
     }
+
+    ensureLockedStrats();
+
     return;
   };
+
+  $scope.addLockedStratagem = function() {
+    ensureLockedStrats();
+
+    if ($scope.lockedStratagems.length < 4 && $scope.lockedStratagems[$scope.lockedStratagems.length - 1].name !== '') {
+      $scope.lockedStratagems.push({name: ''});
+    }
+  }
+
+  function ensureLockedStrats() {
+    if ($scope.lockedStratagems[0].name == '') {
+      return;
+    }
+
+    for (var i = 0; i < $scope.lockedStratagems.length; i++) {
+      let lockedStratName = $scope.lockedStratagems[i].name;
+
+      if (lockedStratName !== '') {
+        let strat = arsenal.stratagems.find(strat => strat.name == lockedStratName);
+        $scope.loadout.stratagems[i] = strat;
+      }
+    }
+  }
 
   if (hash64.hashes) {
     $scope.loadout = arsenal.getLoadout(hash64.hashes[0])

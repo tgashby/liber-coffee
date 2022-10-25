@@ -54,6 +54,14 @@
 
       </select>
     </div>
+    <p class="gothic">Stratagem Lock</p>
+    <div class="stratagems">
+      <select ng-repeat="ls in lockedStratagems" class="dicemode gothic"
+              ng-options="option.name for option in arsenal.stratagems track by option.name"
+              ng-change="addLockedStratagem()"
+              ng-model="lockedStratagems[$index]">
+      </select>
+    </div>
     <p class="gothic">Share</p>
     <div class="share">
       <input ng-model="url" onclick="this.select();" ng-blur="calcHash()">
